@@ -57,6 +57,6 @@ export class AuthenticateController {
     const acessToken = this.jwt.sign({ sub: user.id })
 
     // Retorna o token JWT
-    return { acess_token: acessToken }
+    return { access_token: acessToken }
   }
 }

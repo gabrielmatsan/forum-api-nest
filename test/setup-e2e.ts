@@ -26,11 +26,9 @@ beforeAll(async () => {
   process.env.DATABASE_URL = databaseUrl
 
   execSync('pnpm prisma migrate deploy')
-  console.log(databaseUrl)
 })
 
 afterAll(async () => {
-  console.log('depois')
   await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
   await prisma.$disconnect()
 })
