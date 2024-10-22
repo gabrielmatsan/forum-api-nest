@@ -34,11 +34,11 @@ describe('Create question (E2E)', () => {
         password: hashedPassword,
       },
     })
-    const acessToken = jwt.sign({ sub: user.id })
+    const accessToken = jwt.sign({ sub: user.id })
 
     const response = await request(app.getHttpServer())
-      .set('Authorization', `Bearer ${acessToken}`)
       .post('/questions')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         title: 'New question test title',
         content: 'New question test content',
