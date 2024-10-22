@@ -48,16 +48,19 @@ describe('Fetch Recent Questions(E2E)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send()
     expect(response.status).toBe(200)
+
     expect(response.body.questions.length).toBe(20) // Verifica se 20 perguntas foram
+
     expect(response.body).toEqual(
       expect.objectContaining({
         questions: expect.arrayContaining([
-          {
+          expect.objectContaining({
+            id: expect.any(String),
             title: expect.any(String),
             content: expect.any(String),
-            authorId: expect.any(String),
             slug: expect.any(String),
-          },
+            authorId: expect.any(String),
+          }),
         ]),
       }),
     )
