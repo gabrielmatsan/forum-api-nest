@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport' // Importa o PassportStrategy para definir uma nova estratégia de autenticação.
 import { ExtractJwt, Strategy } from 'passport-jwt' // Importa a estratégia JWT e o método de extração de tokens JWT da biblioteca passport-jwt.
-import { Env } from '@/env'
+import { Env } from '@/infra/env'
 import { z } from 'zod' //
 
 // Define um esquema de validação do payload do token JWT, com o campo `sub` sendo um UUID.

@@ -6,10 +6,10 @@ import {
   UsePipes,
   BadRequestException,
 } from '@nestjs/common'
-import { PrismaService } from '@/prisma/prisma.service'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { hash } from 'bcryptjs'
 import { z } from 'zod'
-import { ZodValidationPipe } from '@/pipes/zod-validation-pipe' // Pipe personalizado para validação usando Zod
+import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe' // Pipe personalizado para validação usando Zod
 
 // Esquema de validação
 const createAccountBodySchema = z.object({

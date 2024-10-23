@@ -4,7 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths' // Corrigir importação
 
 export default defineConfig({
   test: {
-    include: ['**/*.e2e.spec.ts'],
+    include: ['**/*.e2e-spec.ts'],
     globals: true,
     root: './',
     setupFiles: ['./test/setup-e2e.ts'],
