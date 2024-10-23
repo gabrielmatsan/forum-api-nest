@@ -33,10 +33,10 @@ describe('Comment On Answer Use Case', () => {
     await sut.execute({
       answerId: answer.id.toString(),
       authorId: 'another-user',
-      description: 'This is a comment',
+      content: 'This is a comment',
     })
 
-    expect(inMemoryAnswerCommentsRepository.items[0].description).toEqual(
+    expect(inMemoryAnswerCommentsRepository.items[0].content).toEqual(
       'This is a comment',
     )
   })

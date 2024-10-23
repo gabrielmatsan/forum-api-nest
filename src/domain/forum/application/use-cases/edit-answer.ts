@@ -11,7 +11,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 interface EditAnswerRequest {
   authorId: string
   answerId: string
-  description: string
+  content: string
   attachmentsIds: string[]
 }
 
@@ -31,7 +31,7 @@ export class EditAnswerUseCase {
   async execute({
     authorId,
     answerId,
-    description,
+    content,
     attachmentsIds,
   }: EditAnswerRequest): Promise<EditAnswerResponse> {
     const answer = await this.answersRepository.findById(answerId)
@@ -61,7 +61,7 @@ export class EditAnswerUseCase {
 
     answer.attachments = answerAttachmentList
 
-    answer.description = description
+    answer.content = content
 
     await this.answersRepository.update(answer)
 

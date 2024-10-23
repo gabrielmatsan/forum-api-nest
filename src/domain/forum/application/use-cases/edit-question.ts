@@ -12,7 +12,7 @@ interface EditQuestionRequest {
   authorId: string
   questionId: string
   title: string
-  description: string
+  content: string
   attachmentsIds: string[]
 }
 
@@ -33,7 +33,7 @@ export class EditQuestionUseCase {
     authorId,
     questionId,
     title,
-    description,
+    content,
     attachmentsIds,
   }: EditQuestionRequest): Promise<EditQuestionResponse> {
     const question = await this.questionsRepository.findByID(questionId)
@@ -63,7 +63,7 @@ export class EditQuestionUseCase {
 
     question.attachments = questionAttachmentList
     question.title = title
-    question.description = description
+    question.content = content
 
     await this.questionsRepository.update(question)
 

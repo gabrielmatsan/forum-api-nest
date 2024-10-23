@@ -7,7 +7,7 @@ import { AnswerCreateEvent } from '../events/answer-create-event'
 export interface AnswerProps {
   authorId: UniqueEntityID
   questionId: UniqueEntityID
-  description: string
+  content: string
   attachments: AnswerAttachmentList
   createdAt: Date
   updatedAt?: Date
@@ -22,12 +22,12 @@ export class Answer extends AggregateRoot<AnswerProps> {
     return this.props.questionId
   }
 
-  get description() {
-    return this.props.description
+  get content() {
+    return this.props.content
   }
 
-  set description(newDescription: string) {
-    this.props.description = newDescription
+  set content(newContent: string) {
+    this.props.content = newContent
     this.touch()
   }
 
@@ -49,7 +49,7 @@ export class Answer extends AggregateRoot<AnswerProps> {
   }
 
   get excerpt() {
-    return this.description.substring(0, 120).trimEnd().concat('...')
+    return this.content.substring(0, 120).trimEnd().concat('...')
   }
 
   private touch() {

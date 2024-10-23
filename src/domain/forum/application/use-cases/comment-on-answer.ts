@@ -8,7 +8,7 @@ import { ResourceNotFoundError } from '../../../../core/errors/errors/resource-n
 interface CommentOnAnswerUseCaseRequest {
   authorId: string
   answerId: string
-  description: string
+  content: string
 }
 
 type CommentOnAnswerUseCaseResponse = Either<
@@ -27,7 +27,7 @@ export class CommentOnAnswerUseCase {
   async execute({
     authorId,
     answerId,
-    description,
+    content,
   }: CommentOnAnswerUseCaseRequest): Promise<CommentOnAnswerUseCaseResponse> {
     const answer = await this.answerRepository.findById(answerId)
 
@@ -38,7 +38,7 @@ export class CommentOnAnswerUseCase {
     const answerComment = AnswerComment.create({
       authorId: new UniqueEntityID(authorId),
       answerId: new UniqueEntityID(answerId),
-      description,
+      content,
     })
 
     await this.answerCommentsRepository.create(answerComment)

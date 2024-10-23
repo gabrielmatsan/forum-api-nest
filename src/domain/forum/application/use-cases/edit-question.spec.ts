@@ -44,7 +44,7 @@ describe('Edit Question', () => {
 
     await sut.execute({
       title: 'New Title Edit Test',
-      description: 'New Description Edit Test',
+      content: 'New Content Edit Test',
       authorId: newQuestion.authorId.toString(),
       questionId: newQuestion.id.toString(),
       attachmentsIds: ['1', '3'],
@@ -52,7 +52,7 @@ describe('Edit Question', () => {
 
     expect(inMemoryQuestionsRepository.items[0]).toMatchObject({
       title: 'New Title Edit Test',
-      description: 'New Description Edit Test',
+      content: 'New Content Edit Test',
     })
     expect(
       inMemoryQuestionsRepository.items[0].attachments.currentItems,
@@ -72,7 +72,7 @@ describe('Edit Question', () => {
       questionId: newQuestion.id.toString(),
       authorId: 'another-author',
       title: 'This is a title test question',
-      description: 'This is a title test question',
+      content: 'This is a title test question',
       attachmentsIds: [],
     })
     expect(result.isLeft()).toBe(true)

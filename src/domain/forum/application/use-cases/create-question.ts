@@ -8,7 +8,7 @@ import { QuestionAttachmentList } from '../../enterprise/entities/question-attac
 interface CreateQuestionRequestion {
   authorId: string
   title: string
-  description: string
+  content: string
   attachmentsIds: string[]
 }
 
@@ -25,13 +25,13 @@ export class CreateQuestionUseCase {
   async execute({
     authorId,
     title,
-    description,
+    content,
     attachmentsIds,
   }: CreateQuestionRequestion): Promise<CreateQuestionResponse> {
     const question = Question.create({
       authorId: new UniqueEntityID(authorId),
       title,
-      description,
+      content,
     })
 
     const questionAttachments = attachmentsIds.map((attachmentId) => {

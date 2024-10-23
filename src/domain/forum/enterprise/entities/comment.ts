@@ -3,7 +3,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 export interface CommentProps {
   authorId: UniqueEntityID
-  description: string
+  content: string
   createdAt: Date
   updatedAt?: Date
 }
@@ -15,8 +15,8 @@ export abstract class Comment<
     return this.props.authorId
   }
 
-  get description() {
-    return this.props.description
+  get content() {
+    return this.props.content
   }
 
   get createdAt() {
@@ -27,8 +27,8 @@ export abstract class Comment<
     return this.props.updatedAt
   }
 
-  set description(description: string) {
-    this.props.description = description
+  set content(content: string) {
+    this.props.content = content
     this.touch()
   }
 

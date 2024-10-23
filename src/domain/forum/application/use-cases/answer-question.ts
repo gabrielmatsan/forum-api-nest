@@ -9,7 +9,7 @@ interface AnswerQuestionUseCaseRequest {
   instructorId: string
   questionId: string
   attachmentsIds: string[]
-  description: string
+  content: string
 }
 
 type AnswerQuestionUseCaseResponse = Either<null, { answer: Answer }>
@@ -20,11 +20,11 @@ export class AnswerQuestionUseCase {
   async execute({
     instructorId,
     questionId,
-    description,
+    content,
     attachmentsIds,
   }: AnswerQuestionUseCaseRequest): Promise<AnswerQuestionUseCaseResponse> {
     const answer = Answer.create({
-      description,
+      content,
       authorId: new UniqueEntityID(instructorId),
       questionId: new UniqueEntityID(questionId),
     })

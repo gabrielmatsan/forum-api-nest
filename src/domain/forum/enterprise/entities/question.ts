@@ -8,9 +8,9 @@ import { QuestionBestAnswerChosenEvent } from '../events/question-best-answer-ch
 
 export interface QuestionProps {
   authorId: UniqueEntityID
-  bestAnswerId?: UniqueEntityID
+  bestAnswerId?: UniqueEntityID | null
   title: string
-  description: string
+  content: string
   slug: Slug
   attachments: QuestionAttachmentList
   createdAt: Date
@@ -30,8 +30,8 @@ export class Question extends AggregateRoot<QuestionProps> {
     return this.props.title
   }
 
-  get description() {
-    return this.props.description
+  get content() {
+    return this.props.content
   }
 
   get slug() {
@@ -55,7 +55,7 @@ export class Question extends AggregateRoot<QuestionProps> {
   }
 
   get excerpt() {
-    return this.description.substring(0, 120).trimEnd().concat('...')
+    return this.content.substring(0, 120).trimEnd().concat('...')
   }
 
   private touch() {
@@ -68,33 +68,13 @@ export class Question extends AggregateRoot<QuestionProps> {
     this.touch()
   }
 
-  set description(newDescription: string) {
-    this.props.description = newDescription
+  set content(newContent: string) {
+    this.props.content = newContent
     this.touch()
   }
 
-  /**
-   * Sets the best answer ID of the question.
-   *
-   * If the ID is undefined, do nothing.
-   *
-   * If the ID is different from the current best answer ID,
-   * add a domain event to the question.
-   *
-   * @param newBestAnswerId The new best answer ID.
-   */
-  set bestAnswerId(newBestAnswerId: UniqueEntityID | undefined) {
-    if (newBestAnswerId === undefined) {
-      // if the new best answer ID is undefined, do nothing
-      return
-    }
-
-    if (
-      this.props.bestAnswerId === undefined ||
-      // if the new best answer ID is different from the current one,
-      // add a domain event to the question
-      !this.props.bestAnswerId.equals(newBestAnswerId)
-    ) {
+  set bestAnswerId(newBestAnswerId: UniqueEntityID | undefined | null) {
+    if (newBestAnswerId && newBestAnswerId !== this.props.bestAnswerId) {
       this.addDomainEvent(
         new QuestionBestAnswerChosenEvent(this, newBestAnswerId),
       )

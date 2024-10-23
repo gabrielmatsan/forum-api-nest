@@ -42,14 +42,14 @@ describe('Edit Answer', () => {
     )
 
     await sut.execute({
-      description: 'New Description Edit Test',
+      content: 'New Content Edit Test',
       authorId: newAnswer.authorId.toString(),
       answerId: newAnswer.id.toString(),
       attachmentsIds: ['1', '3'],
     })
 
     expect(inMemoryAnswersRepository.items[0]).toMatchObject({
-      description: 'New Description Edit Test',
+      content: 'New Content Edit Test',
     })
 
     expect(inMemoryAnswersRepository.items[0].attachments.currentItems).toEqual(
@@ -69,7 +69,7 @@ describe('Edit Answer', () => {
     const result = await sut.execute({
       answerId: newAnswer.id.toString(),
       authorId: 'another-author',
-      description: 'This is a title test answer',
+      content: 'This is a title test answer',
       attachmentsIds: [],
     })
     expect(result.isLeft()).toBe(true)

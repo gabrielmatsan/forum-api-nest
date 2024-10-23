@@ -18,9 +18,11 @@ export class QuestionMapper {
     return Question.create(
       {
         title: raw.title, // Map the title
-        description: raw.content, // Map the content to description
+        content: raw.content, // Map the content to content
         authorId: new UniqueEntityID(raw.authorId), // Convert authorId to UniqueEntityID
-        bestAnswerId: undefined, // Initialize bestAnswerId as undefined
+        bestAnswerId: raw.bestAnswerId
+          ? new UniqueEntityID(raw.bestAnswerId)
+          : null, // Initialize bestAnswerId as undefined
         slug: Slug.create(raw.slug), // Create a Slug object from the slug string
         createdAt: raw.createdAt, // Map the created_at timestamp
         updatedAt: raw.updatedAt, // Map the updated_at timestamp
