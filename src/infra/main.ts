@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import { ConfigService } from '@nestjs/config'
-import type { Env } from './env'
+import { EnvService } from './env/env.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -9,10 +8,11 @@ async function bootstrap() {
   })
 
   // pegando dependência do ConfigModule
-  // const configService: ConfigService<Env,true> = app.get(ConfigService), outra forma de fazer config
-  const configService = app.get<ConfigService<Env, true>>(ConfigService)
+
+  // const configService = app.get<ConfigService<Env, true>>(ConfigService) outra forma, sem o EnvService, que retira a necessidade de configurar o configService em todo lugar
+  const envService = app.get(EnvService)
   // pegando a porta da variável de ambiente
-  const port = configService.get('PORT', { infer: true })
+  const port = envService.get('PORT')
 
   await app.listen(port)
 }

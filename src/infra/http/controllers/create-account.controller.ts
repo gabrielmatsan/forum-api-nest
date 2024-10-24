@@ -4,12 +4,14 @@ import {
   Post,
   HttpCode,
   UsePipes,
+  ConflictException,
   BadRequestException,
 } from '@nestjs/common'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
-import { hash } from 'bcryptjs'
 import { z } from 'zod'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe' // Pipe personalizado para validação usando Zod
+import { RegisterStudentUseCase } from '@/domain/forum/application/use-cases/register-student'
+import { StudentAlreadyExistsError } from '@/domain/forum/application/use-cases/errors/student-already-exits-error'
+import { Public } from '@/infra/auth/public'
 
 // Esquema de validação
 const createAccountBodySchema = z.object({
@@ -24,31 +26,31 @@ type CreateAccountBodySchema = z.infer<typeof createAccountBodySchema>
 @Controller('/accounts')
 export class CreateAccountController {
   // O PrismaService é injetado para interagir com o banco de dados
-  constructor(private prisma: PrismaService) {}
+  constructor(private registerStudent: RegisterStudentUseCase) {}
 
   @Post()
+  @Public()
   @HttpCode(201)
   @UsePipes(new ZodValidationPipe(createAccountBodySchema))
   async handle(@Body() body: CreateAccountBodySchema) {
     // Desestrutura os dados do corpo da requisição
     const { email, name, password } = body
 
-    // Verifica se já existe um usuário com o mesmo email
-    const userWithSameEmail = await this.prisma.user.findUnique({
-      where: { email },
+    const result = await this.registerStudent.execute({
+      name,
+      email,
+      password,
     })
 
-    // Se já houver um usuário com o mesmo email, lança uma exceção de 'BadRequest'
-    if (userWithSameEmail) {
-      throw new BadRequestException('User with same email already exists')
+    if (result.isLeft()) {
+      const error = result.value
+
+      switch (error.constructor) {
+        case StudentAlreadyExistsError:
+          throw new ConflictException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
-
-    // Criptografa a senha usando bcryptjs
-    const hashedPassword = await hash(password, 8)
-
-    // Cria um novo usuário no banco de dados com os dados fornecidos e a senha criptografada
-    await this.prisma.user.create({
-      data: { email, name, password: hashedPassword },
-    })
   }
 }

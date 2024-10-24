@@ -1,7 +1,7 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Question } from '@/domain/forum/enterprise/entities/question'
 import { Slug } from '@/domain/forum/enterprise/entities/values-objects/slug'
-import { Question as PrismaQuestion } from '@prisma/client'
+import { Question as PrismaQuestion, Prisma } from '@prisma/client'
 export class QuestionMapper {
   /**
    * Converts a PrismaQuestion object to a domain Question object.
@@ -29,5 +29,18 @@ export class QuestionMapper {
       },
       new UniqueEntityID(raw.id), // Convert id to UniqueEntityID
     )
+  }
+
+  static toPersitent(raw: Question): Prisma.QuestionUncheckedCreateInput {
+    return {
+      id: raw.id.toString(),
+      authorId: raw.authorId.toString(),
+      bestAnswerId: raw.bestAnswerId ? raw.bestAnswerId.toString() : null,
+      title: raw.title,
+      content: raw.content,
+      slug: raw.slug.value,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    }
   }
 }

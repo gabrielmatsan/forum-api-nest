@@ -36,9 +36,6 @@ describe('Create question (E2E)', () => {
     // Generate JWT token
     const accessToken = jwt.sign({ sub: user.id })
 
-    // Verify JWT token
-    console.log('Token JWT:', accessToken)
-
     // Send request to create a question
     const response = await request(app.getHttpServer())
       .post('/questions')

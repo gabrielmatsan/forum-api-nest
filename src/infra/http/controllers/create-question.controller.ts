@@ -1,10 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common'
-import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard'
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { z } from 'zod'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
+import { CreateQuestionUseCase } from '@/domain/forum/application/use-cases/create-question'
 
 const createQuestionBodySchema = z.object({
   title: z.string(),
@@ -15,10 +14,11 @@ const createQuestionBodySchema = z.object({
 
 // Define um tipo TypeScript baseado no esquema de validação do Zod
 type CreateQuestionBodySchema = z.infer<typeof createQuestionBodySchema>
+
+// @UseGuards(AuthGuard('jwt')) outra forma
 @Controller('/questions')
-@UseGuards(JwtAuthGuard)
 export class CreateQuestionController {
-  constructor(private prisma: PrismaService) {}
+  constructor(private createQuestion: CreateQuestionUseCase) {}
 
   @Post()
   // @UsePipes(new ZodValidationPipe(createQuestionBodySchema)) // nao vai funcionar, pois esta tentando validar todos os campos da funcao, por isso, o certo é passar a validação somente no body
@@ -30,24 +30,15 @@ export class CreateQuestionController {
     const { title, content } = body
     const userId = user.sub
 
-    await this.prisma.question.create({
-      data: {
-        title,
-        content,
-        authorId: userId,
-        slug: this.stringToSlug(title),
-      },
+    const result = await this.createQuestion.execute({
+      title,
+      content,
+      authorId: userId,
+      attachmentsIds: [],
     })
-  }
 
-  private stringToSlug(text: string): string {
-    return text
-      .toLowerCase() // Convert to lowercase
-      .normalize('NFD') // Normalize the string to separate accents from letters
-      .replace(/[\u0300-\u036f]/g, '') // Remove accents/diacritics
-      .trim() // Trim leading/trailing whitespace
-      .replace(/[^\w\s-]/g, '') // Remove all non-word characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/--+/g, '-') // Remove duplicate hyphens
+    if (result.isLeft()) {
+      throw new BadRequestException()
+    }
   }
 }

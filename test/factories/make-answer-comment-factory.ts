@@ -14,7 +14,7 @@ export function makeAnswerComment(
     {
       authorId: new UniqueEntityID(),
       answerId: new UniqueEntityID(),
-      description: faker.lorem.text(),
+      content: faker.lorem.text(),
       ...override,
     },
     id,

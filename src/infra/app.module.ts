@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common' // Importa o decorador 'Module' do Nest.js para definir um módulo
 import { ConfigModule } from '@nestjs/config' // Importa o módulo de configuração para gerenciar variáveis de ambiente
-import { envSchema } from './env' // Importa o esquema de validação para verificar as variáveis de ambiente
+import { envSchema } from './env/env' // Importa o esquema de validação para verificar as variáveis de ambiente
 import { authModule } from './auth/auth.module'
 
 import { HttpModule } from './http/http.module'
+import { EnvModule } from './env/env.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { HttpModule } from './http/http.module'
     // autenticação
     authModule,
     HttpModule, // Módulo onde estão localizados os controllers
+    EnvModule,
   ],
 })
 export class AppModule {}

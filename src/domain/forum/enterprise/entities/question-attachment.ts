@@ -1,5 +1,5 @@
 import { Entity } from '@/core/entities/entity'
-import type { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 export interface QuestionAttachmentProps {
   questionId: UniqueEntityID

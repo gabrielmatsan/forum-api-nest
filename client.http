@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3333
 @authToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNDVjMGQwOS00Y2Q1LTRjNTctYTM1Ni0zMzRjNTY0NmVjZTIiLCJpYXQiOjE3Mjk0NzY1Nzh9.RbsrZYhSrqJ8d-h24SgM87JvRdeRk3jJ6cdTSJ5zxBpoAepx2Of7RSkeGQnDkl_x3TGqYWN-V49zMoSIAZVN1hh1Md-Q1szprlpmq-LzgQeiinm_u8yQVaOexS5U7BhzkjKWdEL9CrsVxrH9jjck1ZA-FGoa61hlt5a1mg_a3OlqbvCzapVA5N9jU6kniO-lPN3TKzWXrp6Nmq79GrCNiON1UwMav-p6zT5tAxVK7RzzvQKlUpp6qgb-V4mCcAzEhCoSSbb2lZUG9aZ_0WuhWx3hXYsZyw-kIp92mmj_nBbUEc-czoK6LePbUy0CA4nQ2UMaWNwDWb2D0-JlcDHDIw
-@authToken2 = {{authenticate.response.body.acess_token}}
+@authToken2 = {{authenticate.response.body.access_token}}
 
 # @name create_account
 POST {{baseUrl}}/accounts
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "name":"Gabriel Mattos",
-  "email":"gabrielwew@gmail.com",
+  "email":"gabriel3@gmail.com",
   "password":"123456"
 }
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken2}}
 
 {
-  "title": "Test svdssd",
+  "title": "Nova pergunta 4",
   "content": "Funciona, por favor."
 }
 

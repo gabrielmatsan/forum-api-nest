@@ -1,6 +1,6 @@
 import { AggregateRoot } from '../entities/aggregate-root'
-import type { UniqueEntityID } from '../entities/unique-entity-id'
-import type { DomainEvent } from './domain-event'
+import { UniqueEntityID } from '../entities/unique-entity-id'
+import { DomainEvent } from './domain-event'
 import { DomainEvents } from './domain-events'
 
 class CustomAggregateCreate implements DomainEvent {

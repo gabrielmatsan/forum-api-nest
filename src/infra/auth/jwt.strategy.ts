@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport' // Importa o PassportStrategy para definir uma nova estratégia de autenticação.
 import { ExtractJwt, Strategy } from 'passport-jwt' // Importa a estratégia JWT e o método de extração de tokens JWT da biblioteca passport-jwt.
-import { Env } from '@/infra/env'
 import { z } from 'zod' //
+import { EnvService } from '../env/env.service'
 
 // Define um esquema de validação do payload do token JWT, com o campo `sub` sendo um UUID.
 const tokenPayloadSchema = z.object({
@@ -16,10 +15,10 @@ export type UserPayload = z.infer<typeof tokenPayloadSchema>
 // Define a classe JwtStrategy que estende a classe base PassportStrategy. A estratégia é usada para validar tokens JWT.
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  // O construtor recebe o `ConfigService`, que acessa as variáveis de ambiente. Ele é usado para buscar a chave pública.
-  constructor(config: ConfigService<Env, true>) {
+  // O construtor recebe o `EnvService`, que acessa as variáveis de ambiente. Ele é usado para buscar a chave pública.
+  constructor(env: EnvService) {
     // Busca a chave pública (JWT_PUBLIC_KEY) das variáveis de ambiente.
-    const publicKey = config.get('JWT_PUBLIC_KEY', { infer: true })
+    const publicKey = env.get('JWT_PUBLIC_KEY')
 
     // A função `super` chama o construtor da classe `PassportStrategy` e define as opções da estratégia JWT.
     super({

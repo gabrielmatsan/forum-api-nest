@@ -49,6 +49,8 @@ describe('Fetch Recent Questions(E2E)', () => {
       .send()
     expect(response.status).toBe(200)
 
+    expect(response.body.questions).not.toBeNull()
+    expect(response.body.questions).not.toBeUndefined()
     expect(response.body.questions.length).toBe(20) // Verifica se 20 perguntas foram
 
     expect(response.body).toEqual(
@@ -57,9 +59,9 @@ describe('Fetch Recent Questions(E2E)', () => {
           expect.objectContaining({
             id: expect.any(String),
             title: expect.any(String),
-            content: expect.any(String),
             slug: expect.any(String),
-            authorId: expect.any(String),
+            // content: expect.any(String), nao retornado mais por enquanto
+            // authorId: expect.any(String), nao retornado mais por enquanto
           }),
         ]),
       }),
