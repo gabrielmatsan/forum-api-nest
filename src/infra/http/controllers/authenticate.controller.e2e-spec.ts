@@ -1,59 +1,54 @@
 import { AppModule } from '@/infra/app.module'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
+import { DatabaseModule } from '@/infra/database/database.module'
 import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
+import { hash } from 'bcryptjs'
 import request from 'supertest'
+import { StudentFactory } from 'test/factories/make-student-factory'
 
-describe('Create question (E2E)', () => {
+describe('Authenticate Controller (E2E)', () => {
   let app: INestApplication
-  let prisma: PrismaService
+  let studentFactory: StudentFactory
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, DatabaseModule],
+      providers: [StudentFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
 
-    prisma = moduleRef.get(PrismaService)
+    studentFactory = moduleRef.get(StudentFactory)
+
     jwt = moduleRef.get(JwtService)
 
     await app.init()
   })
 
-  test('[POST] /questions', async () => {
+  test('[POST] /sessions', async () => {
     // Create a user
-    const user = await prisma.user.create({
-      data: {
-        name: 'John Doe',
-        email: 'johndoe@example.com',
-        password: '123456',
-      },
+    const user = await studentFactory.makePrismaStudent({
+      password: await hash('123456', 8),
     })
 
     // Generate JWT token
-    const accessToken = jwt.sign({ sub: user.id })
+    const accessToken = jwt.sign({ sub: user.id.toString() })
 
     // Send request to create a question
     const response = await request(app.getHttpServer())
-      .post('/questions')
+      .post('/sessions')
       .set('Authorization', `Bearer ${accessToken}`) // Corrected variable name
       .send({
-        title: 'New question',
-        content: 'New question test content',
+        email: user.email,
+        password: '123456',
       })
 
     // Check if the response status is correct
     expect(response.status).toBe(201)
-
-    // Verify the question is in the database
-    const questionOnDatabase = await prisma.question.findFirst({
-      where: { title: 'New question' },
+    expect(response.body).toEqual({
+      access_token: expect.any(String),
     })
-
-    // Ensure that the question was created successfully
-    expect(questionOnDatabase).toBeTruthy()
   })
 })

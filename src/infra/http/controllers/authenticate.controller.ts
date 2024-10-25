@@ -52,6 +52,6 @@ export class AuthenticateController {
 
     const { accessToken } = result.value
     // Retorna o token JWT
-    return { acess_token: accessToken }
+    return { access_token: accessToken }
   }
 }

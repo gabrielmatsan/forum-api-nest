@@ -1,4 +1,4 @@
-import type { Question } from '@/domain/forum/enterprise/entities/question'
+import { Question } from '@/domain/forum/enterprise/entities/question'
 
 export class HttpQuestionPresenter {
   static toHttp(question: Question) {

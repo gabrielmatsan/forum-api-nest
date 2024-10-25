@@ -6,12 +6,15 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { QuestionFactory } from 'test/factories/make-question-factory'
 import { StudentFactory } from 'test/factories/make-student-factory'
+// import { PrismaService } from '@/infra/database/prisma/prisma.service'
+// caso nao tivesse factory, seria dessa forma
 
-describe('Fetch Recent Questions(E2E)', () => {
+describe('Get Question By Slug(E2E)', () => {
   let app: INestApplication
-  let jwt: JwtService
-  let questionFactory: QuestionFactory
+  // let prisma: PrismaService eslint-disable-line
   let studentFactory: StudentFactory
+  let questionFactory: QuestionFactory
+  let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -21,6 +24,7 @@ describe('Fetch Recent Questions(E2E)', () => {
 
     app = moduleRef.createNestApplication()
 
+    // prisma = moduleRef.get(PrismaService)
     jwt = moduleRef.get(JwtService)
 
     studentFactory = moduleRef.get(StudentFactory)
@@ -28,40 +32,25 @@ describe('Fetch Recent Questions(E2E)', () => {
 
     await app.init()
   })
-  test('[GET] /questions', async () => {
+  test('[GET] /questions/:slug', async () => {
     const user = await studentFactory.makePrismaStudent()
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
-    for (let i = 1; i <= 22; i++) {
-      await questionFactory.makePrismaQuestion({
-        title: `Question title ${i}`,
-        authorId: user.id,
-      })
-    }
+    const question = await questionFactory.makePrismaQuestion({
+      authorId: user.id,
+    })
 
     const response = await request(app.getHttpServer())
-      .get('/questions')
+      .get(`/questions/${question.slug.value}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send()
+
     expect(response.status).toBe(200)
-
-    expect(response.body.questions).not.toBeNull()
-    expect(response.body.questions).not.toBeUndefined()
-    expect(response.body.questions.length).toBe(20) // Verifica se 20 perguntas foram
-
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        questions: expect.arrayContaining([
-          expect.objectContaining({
-            id: expect.any(String),
-            title: expect.any(String),
-            slug: expect.any(String),
-            // content: expect.any(String), nao retornado mais devido ao mapper
-            // authorId: expect.any(String), nao retornado mais devido ao mapper
-          }),
-        ]),
+    expect(response.body).toEqual({
+      question: expect.objectContaining({
+        title: question.title,
       }),
-    )
+    })
   })
 })

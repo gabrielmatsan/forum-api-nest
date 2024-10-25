@@ -5,50 +5,55 @@ import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
+import { QuestionFactory } from 'test/factories/make-question-factory'
 import { StudentFactory } from 'test/factories/make-student-factory'
 
-describe('Create question (E2E)', () => {
+describe('Remove question (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
 
   let studentFactory: StudentFactory
+  let questionFactory: QuestionFactory
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [StudentFactory],
+      providers: [StudentFactory, QuestionFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
 
     studentFactory = moduleRef.get(StudentFactory)
+    questionFactory = moduleRef.get(QuestionFactory)
 
     prisma = moduleRef.get(PrismaService)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
   })
-  test('[POST] /questions', async () => {
+  test('[DELETE] /questions/:id', async () => {
     // Criando user
 
     const user = await studentFactory.makePrismaStudent()
+    const question = await questionFactory.makePrismaQuestion({
+      authorId: user.id,
+    })
+
+    const questionId = question.id.toString()
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
     const response = await request(app.getHttpServer())
-      .post('/questions')
+      .delete(`/questions/${questionId}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        title: 'New question test title',
-        content: 'New question test content',
-      })
-    expect(response.status).toBe(201)
+      .send()
+    expect(response.status).toBe(204)
 
-    const questionOnDatabase = await prisma.question.findFirst({
-      where: { title: 'New question test title' },
+    const questionOnDatabase = await prisma.question.findUnique({
+      where: { id: questionId },
     })
 
-    expect(questionOnDatabase).toBeTruthy()
+    expect(questionOnDatabase).toBeNull()
   })
 })
