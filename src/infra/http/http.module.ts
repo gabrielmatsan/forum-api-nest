@@ -19,6 +19,12 @@ import { AnswerQuestionController } from './controllers/answer-question.controll
 import { AnswerQuestionUseCase } from '@/domain/forum/application/use-cases/answer-question'
 import { EditAnswerController } from './controllers/edit-answer.controller'
 import { EditAnswerUseCase } from '@/domain/forum/application/use-cases/edit-answer'
+import { RemoveAnswerController } from './controllers/remove-answer.controller'
+import { RemoveAnswerUseCase } from '@/domain/forum/application/use-cases/remove-answer'
+import { FetchQuestionAnswersController } from './controllers/fetch-question-answers.controller'
+import { FetchQuestionAnswersUseCase } from '@/domain/forum/application/use-cases/fetch-question-answers'
+import { ChooseQuestionBestAnswerUseCase } from '@/domain/forum/application/use-cases/choose-question-best-answer'
+import { ChooseQuestionBestAnswerController } from './controllers/choose-question-best-answer.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -32,6 +38,9 @@ import { EditAnswerUseCase } from '@/domain/forum/application/use-cases/edit-ans
     RemoveQuestionController,
     AnswerQuestionController,
     EditAnswerController,
+    RemoveAnswerController,
+    FetchQuestionAnswersController,
+    ChooseQuestionBestAnswerController,
   ], // Controlador responsável por lidar com as requisições relacionadas à criação de contas e autenticação
   providers: [
     CreateQuestionUseCase,
@@ -43,6 +52,9 @@ import { EditAnswerUseCase } from '@/domain/forum/application/use-cases/edit-ans
     RemoveQuestionUseCase,
     AnswerQuestionUseCase,
     EditAnswerUseCase,
+    RemoveAnswerUseCase,
+    FetchQuestionAnswersUseCase,
+    ChooseQuestionBestAnswerUseCase,
   ],
 })
 export class HttpModule {}
