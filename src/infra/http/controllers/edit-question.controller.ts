@@ -15,6 +15,7 @@ import { EditQuestionUseCase } from '@/domain/forum/application/use-cases/edit-q
 const editQuestionBodySchema = z.object({
   title: z.string(),
   content: z.string(),
+  attachments: z.array(z.string().uuid()),
 })
 
 // em vez do uso de usePipe, colocaremos o zodValidationPipe diretamente do body
@@ -36,14 +37,14 @@ export class EditQuestionController {
     questionId: string,
     @CurrentUser() user: UserPayload,
   ) {
-    const { title, content } = body
+    const { title, content, attachments } = body
     const userId = user.sub
 
     const result = await this.editQuestion.execute({
       title,
       content,
       authorId: userId,
-      attachmentsIds: [],
+      attachmentsIds: attachments,
       questionId,
     })
 
