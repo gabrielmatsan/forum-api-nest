@@ -42,7 +42,12 @@ describe('Fetch Answer Comments(E2E)', () => {
   })
   test('[GET] /answers/:answerId/comments', async () => {
     // cria user
-    const user = await studentFactory.makePrismaStudent()
+    const user = await studentFactory.makePrismaStudent({
+      name: 'John Doe',
+    })
+    // token
+    const accessToken = jwt.sign({ sub: user.id.toString() })
+
     // cria question
     const question = await questionFactory.makePrismaQuestion({
       authorId: user.id,
@@ -53,15 +58,18 @@ describe('Fetch Answer Comments(E2E)', () => {
       questionId: question.id,
     })
 
-    // cria comments da resposta
-    for (let i = 1; i <= 22; i++) {
-      await answerCommentFactory.makePrismaAnswerComment({
+    await Promise.all([
+      answerCommentFactory.makePrismaAnswerComment({
         authorId: user.id,
         answerId: answer.id,
-      })
-    }
-
-    const accessToken = jwt.sign({ sub: user.id.toString() })
+        content: 'Comment 1',
+      }),
+      answerCommentFactory.makePrismaAnswerComment({
+        authorId: user.id,
+        answerId: answer.id,
+        content: 'Comment 2',
+      }),
+    ])
 
     // lista comments da resposta
     const response = await request(app.getHttpServer())
@@ -71,22 +79,19 @@ describe('Fetch Answer Comments(E2E)', () => {
 
     expect(response.status).toBe(200)
 
-    expect(response.body.comment).not.toBeNull()
-    expect(response.body.comment).not.toBeUndefined()
-    expect(response.body.comment.length).toBe(20) // Verifica se 20 perguntas foram, devido a paginacao
+    expect(response.body.comments).not.toBeNull()
+    expect(response.body.comments).not.toBeUndefined()
+    expect(response.body.comments.length).toBe(2)
 
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        comment: expect.arrayContaining([
-          expect.objectContaining({
-            id: expect.any(String),
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String),
-            content: expect.any(String),
-            // authorId: expect.any(String), nao retornado mais devido ao mapper
-          }),
-        ]),
-      }),
-    )
+    expect(response.body).toEqual({
+      comments: expect.arrayContaining([
+        expect.objectContaining({
+          content: 'Comment 1',
+        }),
+        expect.objectContaining({
+          content: 'Comment 2',
+        }),
+      ]),
+    })
   })
 })

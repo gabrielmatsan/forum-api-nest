@@ -33,7 +33,9 @@ describe('Fetch Question Comments(E2E)', () => {
   })
   test('[GET] /questions/:questionId/comments', async () => {
     // cria user
-    const user = await studentFactory.makePrismaStudent()
+    const user = await studentFactory.makePrismaStudent({
+      name: 'John Doe',
+    })
     // cria question
     const question = await questionFactory.makePrismaQuestion({
       authorId: user.id,
@@ -56,19 +58,15 @@ describe('Fetch Question Comments(E2E)', () => {
 
     expect(response.status).toBe(200)
 
-    expect(response.body.comment).not.toBeNull()
-    expect(response.body.comment).not.toBeUndefined()
-    expect(response.body.comment.length).toBe(20) // Verifica se 20 perguntas foram, devido a paginacao
+    expect(response.body.comments).not.toBeNull()
+    expect(response.body.comments).not.toBeUndefined()
+    expect(response.body.comments.length).toBe(20) // Verifica se 20 perguntas foram, devido a paginacao
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        comment: expect.arrayContaining([
+        comments: expect.arrayContaining([
           expect.objectContaining({
-            id: expect.any(String),
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String),
-            content: expect.any(String),
-            // authorId: expect.any(String), nao retornado mais devido ao mapper
+            authorName: 'John Doe',
           }),
         ]),
       }),

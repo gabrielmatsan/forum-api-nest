@@ -4,6 +4,8 @@ import { QuestionComment } from '@/domain/forum/enterprise/entities/question-com
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { QuestionCommentMapper } from '../mappers/prisma-question-comment-mapper'
+import { CommentsWithAuthor } from '@/domain/forum/enterprise/entities/values-objects/comments-with-author'
+import { CommentWithAuthorMapper } from '../mappers/prisma-comment-with-author-mapper'
 
 @Injectable()
 export class PrismaQuestionCommentsRepository
@@ -51,5 +53,23 @@ export class PrismaQuestionCommentsRepository
       skip: (params.page - 1) * 20,
     })
     return questionComments.map(QuestionCommentMapper.toDomain)
+  }
+
+  async findManyByQuestionIdWithAuthor(
+    questionId: string,
+    params: PaginationParams,
+  ): Promise<CommentsWithAuthor[]> {
+    const questionComments = await this.prisma.comment.findMany({
+      orderBy: { createdAt: 'desc' },
+      where: {
+        questionId,
+      },
+      include: {
+        author: true,
+      },
+      take: 20,
+      skip: (params.page - 1) * 20,
+    })
+    return questionComments.map(CommentWithAuthorMapper.toDomain)
   }
 }

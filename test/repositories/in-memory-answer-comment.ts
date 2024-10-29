@@ -1,11 +1,15 @@
 import { PaginationParams } from '@/core/repositories/pagination-params'
 import { AnswerCommentsRepository } from '@/domain/forum/application/repositories/answers-comments-repository'
 import { AnswerComment } from '@/domain/forum/enterprise/entities/answer-comment'
+import { InMemoryStudentsRepository } from './in-memory-students-repository'
+import { CommentsWithAuthor } from '@/domain/forum/enterprise/entities/values-objects/comments-with-author'
 
 export class InMemoryAnswerCommentsRepository
   implements AnswerCommentsRepository
 {
   public items: AnswerComment[] = []
+
+  constructor(private studentsRepository: InMemoryStudentsRepository) {}
 
   async create(answerComment: AnswerComment) {
     this.items.push(answerComment)
@@ -36,6 +40,37 @@ export class InMemoryAnswerCommentsRepository
     const answerComment = await this.items
       .filter((item) => item.answerId.toString() === answerId)
       .slice((page - 1) * 20, page * 20)
+
+    return answerComment
+  }
+
+  async findManyByAnswerIdWithAuthor(
+    answerId: string,
+    { page }: PaginationParams,
+  ): Promise<CommentsWithAuthor[]> {
+    const answerComment = await this.items
+      .filter((item) => item.answerId.toString() === answerId)
+      .slice((page - 1) * 20, page * 20)
+      .map((comment) => {
+        const author = this.studentsRepository.items.find((student) => {
+          return student.id.equals(comment.authorId)
+        })
+
+        if (!author) {
+          throw new Error(
+            `Author with ID ${comment.authorId.toString()} not found`,
+          )
+        }
+
+        return CommentsWithAuthor.create({
+          content: comment.content,
+          authorId: comment.authorId,
+          authorName: author?.name,
+          createdAt: comment.createdAt,
+          updatedAt: comment.updatedAt,
+          commentId: comment.id,
+        })
+      })
 
     return answerComment
   }
