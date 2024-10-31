@@ -66,7 +66,7 @@ describe('Get Question', () => {
     expect(result.value).toMatchObject({
       question: expect.objectContaining({
         title: newQuestion.title,
-        author: 'John Doe',
+        authorName: 'John Doe',
         attachments: [
           expect.objectContaining({
             title: attachment.title,

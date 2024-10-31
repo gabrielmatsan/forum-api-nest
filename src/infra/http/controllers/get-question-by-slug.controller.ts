@@ -5,8 +5,8 @@ import {
   Injectable,
   Param,
 } from '@nestjs/common'
-import { HttpQuestionPresenter } from '../presenters/http-question-presenter'
 import { GetQuestionBySlugUseCase } from '@/domain/forum/application/use-cases/get-question-by-slug'
+import { HttpQuestionDetailsPresenter } from '../presenters/http-question-details-presenter'
 
 @Injectable()
 @Controller('/questions/:slug')
@@ -21,6 +21,8 @@ export class GetQuestionBySlugController {
       throw new BadRequestException()
     }
 
-    return { question: HttpQuestionPresenter.toHttp(result.value.question) }
+    return {
+      question: HttpQuestionDetailsPresenter.toHttp(result.value.question),
+    }
   }
 }

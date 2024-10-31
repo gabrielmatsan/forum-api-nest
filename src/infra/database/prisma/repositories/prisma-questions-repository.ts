@@ -5,6 +5,9 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { QuestionMapper } from '../mappers/prisma-question-mapper'
 import { QuestionAttachmentsRepository } from '@/domain/forum/application/repositories/question-attachments-repository'
+import { QuestionDetails } from '@/domain/forum/enterprise/entities/values-objects/question-details'
+import { QuestionDetailsMapper } from '../mappers/prisma-question-details-mapper'
+import { DomainEvents } from '@/core/events/domain-events'
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
@@ -26,13 +29,10 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     await this.questionAttachmentsRepository.createMany(
       question.attachments.getItems(),
     )
+
+    DomainEvents.dispatchEventsForAggregate(question.id)
   }
 
-  /**
-   * Update a question
-   *
-   * @param question - The question to update
-   */
   async update(question: Question): Promise<void> {
     const data = QuestionMapper.toPersitent(question) // Formato DB Prisma
 
@@ -50,6 +50,8 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
         question.attachments.getRemovedItems(),
       ),
     ])
+
+    DomainEvents.dispatchEventsForAggregate(question.id)
   }
 
   /**
@@ -85,6 +87,24 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     }
 
     return QuestionMapper.toDomain(question)
+  }
+
+  async findDetailsBySlug(slug: string): Promise<QuestionDetails | null> {
+    const question = await this.prisma.question.findUnique({
+      where: {
+        slug,
+      },
+      include: {
+        author: true,
+        attachments: true,
+      },
+    })
+
+    if (!question) {
+      return null
+    }
+
+    return QuestionDetailsMapper.toDomain(question)
   }
 
   /**
