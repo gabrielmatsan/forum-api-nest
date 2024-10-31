@@ -35,6 +35,7 @@ export class ReadNotificationUseCase {
     }
 
     notification.read()
+    await this.notificationsRepository.save(notification)
 
     return right({ notification })
   }

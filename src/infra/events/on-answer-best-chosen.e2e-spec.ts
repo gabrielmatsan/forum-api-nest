@@ -6,28 +6,31 @@ import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
+import { AnswerFactory } from 'test/factories/make-answer-factory'
 import { QuestionFactory } from 'test/factories/make-question-factory'
 import { StudentFactory } from 'test/factories/make-student-factory'
 import { waitFor } from 'test/utils/wait-for'
 
-describe('On Answer Created Notification (E2E)', () => {
+describe('On Question Best Chosen (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
 
   let studentFactory: StudentFactory
   let questionFactory: QuestionFactory
+  let answerFactory: AnswerFactory
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [StudentFactory, QuestionFactory],
+      providers: [StudentFactory, QuestionFactory, AnswerFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
 
     studentFactory = moduleRef.get(StudentFactory)
     questionFactory = moduleRef.get(QuestionFactory)
+    answerFactory = moduleRef.get(AnswerFactory)
 
     prisma = moduleRef.get(PrismaService)
     jwt = moduleRef.get(JwtService)
@@ -36,25 +39,32 @@ describe('On Answer Created Notification (E2E)', () => {
 
     await app.init()
   })
-  it('should send a notification when answer is created', async () => {
-    // Criando user
-
+  it('should be send a notification when an answer is chosen as best in a question', async () => {
+    // user
     const user = await studentFactory.makePrismaStudent()
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
+    // pergunta do user 1
     const question = await questionFactory.makePrismaQuestion({
       authorId: user.id,
     })
 
-    const questionId = question.id.toString()
+    // user responde
+    const answer = await answerFactory.makePrismaAnswer({
+      authorId: user.id,
+      questionId: question.id,
+    })
 
+    // answerId em string
+    const answerId = answer.id.toString()
+
+    // token para rotas com autenticação
+
+    // user escolhe a melhor resposta
     await request(app.getHttpServer())
-      .post(`/questions/${questionId}/answers`)
+      .patch(`/answers/${answerId}/choose-as-best`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        content: 'New answer test content',
-        attachments: [],
-      })
+      .send()
 
     await waitFor(async () => {
       const notificationOnDatabase = await prisma.notification.findFirst({
